@@ -21,7 +21,7 @@
                 "css/repeaterStyle.css"
             ],
             "js": [
-                "js/repeater.js"
+                "out/sr_tsc.js"
             ]
         }
     ],
