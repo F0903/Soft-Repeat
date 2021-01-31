@@ -28,31 +28,18 @@ export class Repeater
 	{
 		let nums = elems.map((elem) => {
 			const input = elem.value;
-			const splits = input.split("|");
-			if (splits.length < 1 || splits.length > 4)
-			throw new Error("Incorrect format.");
+			const splits = input.split(":");
 
-			// Look for better ways to do this (if there is).
-			var inSecs = 0;
-			splits.forEach((x, i) => {
-				if (splits.length == 1 && i == 0) {
-					inSecs += parseInt(x);
-				}
-				else if (splits.length == 2 && i == 1) {
-					inSecs += parseInt(x) * 60;
-				}
-				else if (splits.length == 3 && i == 2) {
-					inSecs += parseInt(x) * 60 * 60;
-				}
-				else if (splits.length == 4 && i == 3) {
-					inSecs += parseInt(x) * 60 * 60 * 60;
-				}
+			var secs = 0;
+			splits.reverse().forEach((x, i) => {
+				secs += parseInt(x) * 60 ** (i + 1);
 			});
-			return inSecs;
+			return secs;
 		})
 		return [nums[0], nums[1]];
 	}
 
+	//TODO: Check if it's possible to hook into relevant events, instead of polling
 	async Run()
 	{
 		console.log("Started RunRepeater");
