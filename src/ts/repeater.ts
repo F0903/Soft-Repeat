@@ -35,7 +35,6 @@ export class Repeater
 		return [nums[0], nums[1]];
 	}
 
-	//TODO: Check if it's possible to hook into relevant events, instead of polling
 	async Run()
 	{
 		console.log("Started RunRepeater");
@@ -43,6 +42,7 @@ export class Repeater
 		const video = await GetElementByTag("video") as HTMLVideoElement;
 		const timeElems = await this.AddBody();
 
+		//TODO: Run this through events, not polling.
 		const sleepTime = 1000;
 		const nextLoop = () => setTimeout(runLoop, sleepTime);
 		const runLoop = async () =>
@@ -57,6 +57,27 @@ export class Repeater
 
 			const [from, to] = await this.GetLoopPeriod(timeElems);
 			console.log(`From Time: ${from}\nTo Time: ${to}`);
+
+			try {
+				const duration = video.duration;
+				if (duration == Infinity)
+					throw new Error("Cannot loop a livestream.");
+				else if (duration != NaN && duration && to > duration)
+					throw new Error("Selected duration is longer than the video.");
+				else if (from < 0 || to < 0)
+					throw new Error("Duration cannot be under 0.");
+				else if (from > to)
+					throw new Error("From cannot be larger than To.");
+			}
+			catch {
+				//TODO: Add error catching, and visually show what the user is doing wrong.
+			}
+
+			const time = video.currentTime;
+			if (time < from)
+				video.currentTime = from;
+			else if (time > to)
+				video.currentTime = from;
 
 			nextLoop();
 		};
