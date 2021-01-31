@@ -18,7 +18,7 @@
                 "*://www.youtube.com/watch?v=*"
             ],
             "css": [
-                "css/repeaterStyle.css"
+                "src/css/repeaterStyle.css"
             ],
             "js": [
                 "out/sr_tsc.js"
