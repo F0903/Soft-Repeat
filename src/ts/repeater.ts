@@ -2,11 +2,6 @@ import { GetElementByTag, AddInputter, GetElementByIdAndTag } from "./util";
 
 export class Repeater
 {
-	constructor()
-	{
-		this.AddBody();
-	}
-
 	// Adds the control body of the repeater
 	private async AddBody(): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
@@ -29,10 +24,11 @@ export class Repeater
 		let nums = elems.map((elem) => {
 			const input = elem.value;
 			const splits = input.split(":");
+			console.log(`Starting split for elem ${elem}`);
 
 			var secs = 0;
 			splits.reverse().forEach((x, i) => {
-				secs += parseInt(x) * 60 ** (i + 1);
+				secs += parseInt(x) * (i == 0 ? 1 : (60 ** i));
 			});
 			return secs;
 		})

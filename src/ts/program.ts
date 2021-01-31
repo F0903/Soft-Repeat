@@ -1,4 +1,8 @@
 import { Repeater } from "./repeater";
 
-const repeater = new Repeater();
-repeater.Run();
+async function Start() {
+	const repeater = new Repeater();
+	await repeater.Run();
+}
+
+Start();
