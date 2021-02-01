@@ -54,7 +54,7 @@ export async function AddInputElement(parent: Element, className: string, id: st
 		elem.setAttribute("id", id);
 	elem.setAttribute("type", "text");
 	elem.setAttribute("maxlength", "8");
-	elem.setAttribute("pattern", /\d:*/.source); // dunno if the RegExp.source works? Didn't need that in JS
+	elem.onkeyup = () => elem.value = elem.value.replace(/((?!\d|:).)+/, "");
 	parent.appendChild(elem);
 	return elem;
 }
