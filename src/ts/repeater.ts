@@ -1,23 +1,20 @@
-import { Sleep, GetElementByTag, AddInputter, GetElementByIdAndTag } from "./util";
+import { Sleep, TryGetElementByTag, AddInputter } from "./util";
 
 export class Repeater
 {
-	private root: HTMLDivElement;
-
 	// Adds the control body of the repeater
-	private async AddBody(): Promise<[HTMLInputElement, HTMLInputElement]>
+	private async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
-		const parent = await GetElementByIdAndTag("menu-container", "div");
+		//const parent = await GetElementByIdAndTag("menu-container", "div");
 
-		this.root = document.createElement("div");
-
-		this.root.setAttribute("id", "repeater-body");
-		this.root.setAttribute("class", "repeater-body-renderer");
-		parent.insertBefore(this.root, parent.firstChild);
+		const elem = document.createElement("div");
+		elem.setAttribute("id", "repeater-body");
+		elem.setAttribute("class", "repeater-body-renderer");
+		parent.insertBefore(elem, parent.firstChild);
 		console.log(`Created repeater element at <${parent.tagName} id="${parent.id}" class="${parent.className}>`);
 
-		const [, fromInput] = await AddInputter(this.root, "from");
-		const [, toInput] = await AddInputter(this.root, "to");
+		const [, fromInput] = await AddInputter(elem, "from");
+		const [, toInput] = await AddInputter(elem, "to");
 		return [fromInput as HTMLInputElement, toInput as HTMLInputElement];
 	}
 
@@ -37,12 +34,12 @@ export class Repeater
 		return [nums[0], nums[1]];
 	}
 
-	async Run()
+	async Run(parent: HTMLElement)
 	{
 		console.log("Started RunRepeater");
 
-		const video = await GetElementByTag("video") as HTMLVideoElement;
-		const timeElems = await this.AddBody();
+		const video = await TryGetElementByTag("video") as HTMLVideoElement;
+		const timeElems = await this.AddBody(parent);
 
 		//TODO: Run this through events, not polling.
 		const sleepTime = 1000;
@@ -77,7 +74,6 @@ export class Repeater
 			{
 				//TODO: Add error catching, and visually show what the user is doing wrong.
 
-				this.root.setAttribute("backgroundColor", "red");
 			}
 
 			//TODO: Lerp smoothly to value.
