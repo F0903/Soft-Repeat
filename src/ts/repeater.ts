@@ -55,7 +55,10 @@ export class Repeater
 				return;
 			}
 
-			const [from, to] = await this.GetLoopPeriod(timeElems);
+			let [from, to] = await this.GetLoopPeriod(timeElems);
+			from = from != NaN ? from : 0; // If no input was given, just use 0.
+			to = to != NaN ? to : video.duration; // If no input was given, use the duration.
+
 			console.log(`From Time: ${from}\nTo Time: ${to}`);
 
 			try
