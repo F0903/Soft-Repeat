@@ -58,7 +58,8 @@ export class Repeater
 			const [from, to] = await this.GetLoopPeriod(timeElems);
 			console.log(`From Time: ${from}\nTo Time: ${to}`);
 
-			try {
+			try
+			{
 				const duration = video.duration;
 				if (duration == Infinity)
 					throw new Error("Cannot loop a livestream.");
@@ -69,18 +70,36 @@ export class Repeater
 				else if (from > to)
 					throw new Error("From cannot be larger than To.");
 			}
-			catch {
+			catch
+			{
 				//TODO: Add error catching, and visually show what the user is doing wrong.
 			}
 
+			//TODO: Lerp smoothly to value.
 			const time = video.currentTime;
 			if (time < from)
+			{
 				video.currentTime = from;
+			}
 			else if (time > to)
+			{
+				await this.LerpVolume(video, 0);
 				video.currentTime = from;
+				await this.LerpVolume(video, 1);
+			}
 
 			nextLoop();
 		};
 		runLoop();
+	}
+
+	LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
+		const firstVol = video.volume;
+		const iters = 20000;
+		for (let i = 0; i <= iters; i++) {
+			let dbg = video.volume = firstVol - (firstVol - toValue) * (i / iters);
+			console.log(`Set volume to: ${dbg}`);
+		}
+		return;
 	}
 }
