@@ -1,21 +1,23 @@
-import { GetElementByTag, AddInputter, GetElementByIdAndTag } from "./util";
+import { Sleep, GetElementByTag, AddInputter, GetElementByIdAndTag } from "./util";
 
 export class Repeater
 {
+	private root: HTMLDivElement;
+
 	// Adds the control body of the repeater
 	private async AddBody(): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
 		const parent = await GetElementByIdAndTag("menu-container", "div");
 
-		const repeaterRoot = document.createElement("div");
+		this.root = document.createElement("div");
 
-		repeaterRoot.setAttribute("id", "repeater-body");
-		repeaterRoot.setAttribute("class", "repeater-body-renderer");
-		parent.insertBefore(repeaterRoot, parent.firstChild);
+		this.root.setAttribute("id", "repeater-body");
+		this.root.setAttribute("class", "repeater-body-renderer");
+		parent.insertBefore(this.root, parent.firstChild);
 		console.log(`Created repeater element at <${parent.tagName} id="${parent.id}" class="${parent.className}>`);
 
-		const [, fromInput] = await AddInputter(repeaterRoot, "from");
-		const [, toInput] = await AddInputter(repeaterRoot, "to");
+		const [, fromInput] = await AddInputter(this.root, "from");
+		const [, toInput] = await AddInputter(this.root, "to");
 		return [fromInput as HTMLInputElement, toInput as HTMLInputElement];
 	}
 
@@ -49,7 +51,8 @@ export class Repeater
 		{
 			// Where we check for the current duration and when we should fade.
 			const loop: boolean = video.loop;
-			if (!loop) // If the video loop value is false, just return, but make sure to still keep the loop running.
+			// Check if loop is on, or if any of the input boxes have focus.
+			if (!loop || timeElems.some((x) => x === document.activeElement))
 			{
 				nextLoop();
 				return;
@@ -73,6 +76,8 @@ export class Repeater
 			catch
 			{
 				//TODO: Add error catching, and visually show what the user is doing wrong.
+
+				this.root.setAttribute("backgroundColor", "red");
 			}
 
 			//TODO: Lerp smoothly to value.
@@ -93,12 +98,13 @@ export class Repeater
 		runLoop();
 	}
 
-	LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
+	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
 		const firstVol = video.volume;
-		const iters = 20000;
+		const milliDuration = 3000; // The duration of the lerp.
+		const iters = 100; // The amount of fractions to do it in.
 		for (let i = 0; i <= iters; i++) {
-			let dbg = video.volume = firstVol - (firstVol - toValue) * (i / iters);
-			console.log(`Set volume to: ${dbg}`);
+			video.volume = firstVol - (firstVol - toValue) * (i / iters);
+			await Sleep(milliDuration / iters);
 		}
 		return;
 	}
