@@ -23,7 +23,6 @@ export class Repeater
 		let nums = elems.map((elem) => {
 			const input = elem.value;
 			const splits = input.split(":");
-			console.log(`Starting split for elem ${elem}`);
 
 			var secs = 0;
 			splits.reverse().forEach((x, i) => {
@@ -56,17 +55,17 @@ export class Repeater
 			}
 
 			let [from, to] = await this.GetLoopPeriod(timeElems);
-			from = from != NaN ? from : 0; // If no input was given, just use 0.
-			to = to != NaN ? to : video.duration; // If no input was given, use the duration.
+			if (isNaN(from)) from = 0;
+			if (isNaN(to)) to = video.duration;
 
 			console.log(`From Time: ${from}\nTo Time: ${to}`);
 
 			try
 			{
 				const duration = video.duration;
-				if (duration == Infinity)
+				if (duration === Infinity)
 					throw new Error("Cannot loop a livestream.");
-				else if (duration != NaN && duration && to > duration)
+				else if (!isNaN(duration) && duration && to > duration)
 					throw new Error("Selected duration is longer than the video.");
 				else if (from < 0 || to < 0)
 					throw new Error("Duration cannot be under 0.");
