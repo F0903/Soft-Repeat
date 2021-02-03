@@ -2,6 +2,8 @@ import { Sleep, TryGetElementByTag, AddInputter } from "./util";
 
 export class Repeater
 {
+	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
+
 	// Adds the control body of the repeater
 	private async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
@@ -20,7 +22,7 @@ export class Repeater
 
 	private async GetLoopPeriod(elems:[from: HTMLInputElement, to: HTMLInputElement]): Promise<[number, number]>
 	{
-		let nums = elems.map((elem) => {
+		const nums = elems.map((elem) => {
 			const input = elem.value;
 			const splits = input.split(":");
 
@@ -40,17 +42,18 @@ export class Repeater
 		const video = await TryGetElementByTag("video") as HTMLVideoElement;
 		const timeElems = await this.AddBody(parent);
 
-		let playing = video.autoplay;
+		let playing = true;
 		video.onplay = () => playing = true;
 		video.onpause = () => playing = false;
 
-		//TODO: Run this through events, not polling.
+		//TODO: Run this through events, not polling?
 		const sleepTime = 1000;
 		const nextLoop = () => setTimeout(runLoop, sleepTime);
 		const runLoop = async () =>
 		{
 			const loop: boolean = video.loop;
 
+			console.log(`loop: ${loop}, no_input_focus: ${!timeElems.some((x) => x === document.activeElement)}, playing: ${playing}`);
 			const shouldLoop = () => loop && !timeElems.some((x) => x === document.activeElement) && playing;
 			if (!shouldLoop())
 			{
@@ -84,12 +87,13 @@ export class Repeater
 
 			//TODO: Lerp smoothly to value.
 			const time = video.currentTime;
-			if (time < from)
+			if (time <= from)
 			{
 				video.currentTime = from;
 			}
-			else if (time > to)
+			else if (time >= to - Repeater.lerpMilliDuration / 1000)
 			{
+				console.log(`fading out... time was: ${time}`);
 				await this.LerpVolume(video, 0);
 				video.currentTime = from;
 				await this.LerpVolume(video, 1);
@@ -102,11 +106,10 @@ export class Repeater
 
 	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
 		const firstVol = video.volume;
-		const milliDuration = 3000; // The duration of the lerp.
 		const iters = 100; // The amount of fractions to do it in.
 		for (let i = 0; i <= iters; i++) {
 			video.volume = firstVol - (firstVol - toValue) * (i / iters);
-			await Sleep(milliDuration / iters);
+			await Sleep(Repeater.lerpMilliDuration / iters);
 		}
 		return;
 	}

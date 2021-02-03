@@ -3,7 +3,7 @@
 	"module": "ES2020",
 	"lib": ["ES2020", "DOM"],
 	"outDir": "out_tsc/",
-	"target": "ES3",
+	"target": "ES6",
 	"noImplicitAny": true,
 	"removeComments": true,
 	"preserveConstEnums": true,
