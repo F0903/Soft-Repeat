@@ -40,15 +40,19 @@ export class Repeater
 		const video = await TryGetElementByTag("video") as HTMLVideoElement;
 		const timeElems = await this.AddBody(parent);
 
+		let playing = video.autoplay;
+		video.onplay = () => playing = true;
+		video.onpause = () => playing = false;
+
 		//TODO: Run this through events, not polling.
 		const sleepTime = 1000;
 		const nextLoop = () => setTimeout(runLoop, sleepTime);
 		const runLoop = async () =>
 		{
-			// Where we check for the current duration and when we should fade.
 			const loop: boolean = video.loop;
-			// Check if loop is on, or if any of the input boxes have focus.
-			if (!loop || timeElems.some((x) => x === document.activeElement))
+
+			const shouldLoop = () => loop && !timeElems.some((x) => x === document.activeElement) && playing;
+			if (!shouldLoop())
 			{
 				nextLoop();
 				return;
