@@ -1,8 +1,12 @@
-export async function Sleep(ms: number) { return new Promise(resolve => setTimeout(resolve, ms)); }
+export async function Sleep(ms: number)
+{
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export async function TryGetElementByTag(elemTag: string)
 {
-	for (let attempt = 0; attempt < 3; attempt++) {
+	for (let attempt = 0; attempt < 3; attempt++)
+	{
 		const elem = document.getElementsByTagName(elemTag)[0];
 		if (elem != null)
 			return elem;
@@ -13,7 +17,10 @@ export async function TryGetElementByTag(elemTag: string)
 export async function OnElementExists(elemId: string, onFound: (elem: HTMLElement) => any): Promise<void>
 {
 	let elem = null;
-	while ((elem = document.getElementById(elemId)) === null) { await Sleep(20);}
+	while ((elem = document.getElementById(elemId)) === null)
+	{
+		await Sleep(20);
+	}
 	onFound(elem);
 }
 

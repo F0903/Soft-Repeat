@@ -1,0 +1,4 @@
+out
+out_tsc
+node_modules
+*.config.js

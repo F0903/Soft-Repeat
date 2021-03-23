@@ -6,6 +6,11 @@ export class Repeater
 
 	private playing: boolean;
 
+	async AddCollapser(parent: HTMLElement): Promise<void>
+	{
+
+	}
+
 	// Adds the control body of the repeater
 	async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
@@ -22,16 +27,18 @@ export class Repeater
 
 	async GetLoopPeriod(elems:[from: HTMLInputElement, to: HTMLInputElement]): Promise<[number, number]>
 	{
-		const nums = elems.map((elem) => {
+		const nums = elems.map((elem) =>
+		{
 			const input = elem.value;
 			const splits = input.split(":");
 
-			var secs = 0;
-			splits.reverse().forEach((x, i) => {
+			let secs = 0;
+			splits.reverse().forEach((x, i) =>
+			{
 				secs += parseInt(x) * (i == 0 ? 1 : (60 ** i));
 			});
 			return secs;
-		})
+		});
 		return [nums[0], nums[1]];
 	}
 
@@ -48,16 +55,17 @@ export class Repeater
 		{
 			this.playing = true;
 			this.Loop(video, timeElems);
-		}
+		};
 		video.onpause = () =>
 		{
 			this.playing = false;
-		}
+		};
 
 		this.Loop(video, timeElems);
 	}
 
-	Loop = async (video: HTMLVideoElement, timeInput: [HTMLInputElement, HTMLInputElement]) => {
+	Loop = async (video: HTMLVideoElement, timeInput: [HTMLInputElement, HTMLInputElement]) =>
+	{
 		const sleepTime = 1000;
 
 		console.log(`Entered loop. Video elem: ${video}`);
@@ -120,10 +128,12 @@ export class Repeater
 		nextLoop();
 	}
 
-	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
+	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void>
+	{
 		const firstVol = video.volume;
 		const iters = 100; // The amount of fractions to do it in.
-		for (let i = 0; i <= iters; i++) {
+		for (let i = 0; i <= iters; i++)
+		{
 			video.volume = firstVol - (firstVol - toValue) * (i / iters);
 			await Sleep(Repeater.lerpMilliDuration / iters);
 		}
