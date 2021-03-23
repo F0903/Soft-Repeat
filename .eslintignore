@@ -1,4 +1,4 @@
-out
-out_tsc
+inter
+dist
 node_modules
 *.config.js

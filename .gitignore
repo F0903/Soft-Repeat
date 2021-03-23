@@ -1,6 +1,8 @@
 .vscode/
 
-out/
-out_tsc/
+# Intermediate
+inter/
+# Output
+dist/
 
 node_modules/

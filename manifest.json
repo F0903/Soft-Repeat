@@ -21,7 +21,7 @@
                 "src/css/repeaterStyle.css"
             ],
             "js": [
-				"out/main.js"
+				"dist/js/main.js"
             ]
         }
     ],
