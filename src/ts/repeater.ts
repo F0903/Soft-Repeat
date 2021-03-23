@@ -1,27 +1,38 @@
-import { Sleep, TryGetElementByTag, AddInputter } from "./util";
-
+import { Sleep } from "./util";
+import { TryGetElementByTag, AddInputter } from "./dom";
+import { OnAttributeChanged } from "./observer";
 export class Repeater
 {
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
 
 	private playing: boolean;
 
-	async AddCollapser(parent: HTMLElement): Promise<void>
-	{
+	private looping: boolean;
 
+	private repeaterBody: HTMLElement;
+
+	async Expand(): Promise<void>
+	{
+		this.repeaterBody.hidden = false;
+	}
+
+	async Collapse(): Promise<void>
+	{
+		this.repeaterBody.hidden = true;
 	}
 
 	// Adds the control body of the repeater
 	async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
-		const elem = document.createElement("div");
-		elem.setAttribute("id", "repeater-body");
-		elem.setAttribute("class", "repeater-body-renderer");
-		parent.insertBefore(elem, parent.firstChild);
+		this.repeaterBody = document.createElement("div");
+		this.repeaterBody.setAttribute("id", "repeater-body");
+		this.repeaterBody.setAttribute("class", "repeater-body-renderer");
+		await this.Collapse();
+		parent.insertBefore(this.repeaterBody, parent.firstChild);
 		console.log(`Created repeater element at <${parent.tagName} id="${parent.id}" class="${parent.className}>`);
 
-		const [, fromInput] = await AddInputter(elem, "from");
-		const [, toInput] = await AddInputter(elem, "to");
+		const [, fromInput] = await AddInputter(this.repeaterBody, "from");
+		const [, toInput] = await AddInputter(this.repeaterBody, "to");
 		return [fromInput as HTMLInputElement, toInput as HTMLInputElement];
 	}
 
@@ -42,7 +53,7 @@ export class Repeater
 		return [nums[0], nums[1]];
 	}
 
-	async Run(parent: HTMLElement)
+	async Start(parent: HTMLElement): Promise<void>
 	{
 		console.log("Started RunRepeater");
 
@@ -50,32 +61,50 @@ export class Repeater
 		const timeElems = await this.AddBody(parent);
 
 		this.playing = true;
+		this.looping = false;
 
+		const determine = () =>
+		{
+			if (!this.looping)
+			{
+				this.Collapse();
+				return;
+			}
+			this.Expand();
+			if (!this.playing)
+				return;
+			this.Loop(video, timeElems);
+		};
 		video.onplay = () =>
 		{
 			this.playing = true;
-			this.Loop(video, timeElems);
+			determine();
 		};
 		video.onpause = () =>
 		{
 			this.playing = false;
+			determine();
+		};
+		const onloop = (val: boolean) =>
+		{
+			console.log(`onloop(${val})`);
+			this.looping = val;
+			determine();
 		};
 
-		this.Loop(video, timeElems);
+		OnAttributeChanged<boolean, HTMLVideoElement>(video, "loop", (x) => x.loop, onloop);
 	}
 
-	Loop = async (video: HTMLVideoElement, timeInput: [HTMLInputElement, HTMLInputElement]) =>
+	Loop = async (video: HTMLVideoElement, timeInput: [HTMLInputElement, HTMLInputElement]): Promise<void> =>
 	{
 		const sleepTime = 1000;
 
 		console.log(`Entered loop. Video elem: ${video}`);
 
-		const notLooping = !video.loop;
 		const inputSelected = timeInput.some((x) => x === document.activeElement);
-		const notPlaying = !this.playing;
 
-		const shouldExit = () => notPlaying;
-		const shouldSkip = () => notLooping || inputSelected;
+		const shouldExit = () => !this.looping || !this.playing;
+		const shouldSkip = () => inputSelected;
 		const nextLoop = () => setTimeout(this.Loop, sleepTime, video, timeInput);
 
 		if (shouldExit())

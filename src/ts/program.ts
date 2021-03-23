@@ -1,5 +1,5 @@
 import { Repeater } from "./repeater";
-import { OnElementExists } from "./util";
+import { OnElementExists } from "./dom";
 
 const repeater = new Repeater();
-OnElementExists("menu-container", async (x) => await repeater.Run(x));
+OnElementExists("menu-container", async (x) => await repeater.Start(x));
