@@ -3,10 +3,10 @@
     "version": "0.1",
     "description": "An extension that lets you repeat a YouTube video between two custom points in time, easily fading in and out.",
     "icons": {
-        "16": "media/cah.png",
-        "32": "media/cah.png",
-        "48": "media/cah.png",
-        "128": "media/cah64.png"
+        "16": "media/Soft Repeat Logo.png",
+        "32": "media/Soft Repeat Logo.png",
+        "48": "media/Soft Repeat Logo.png",
+        "128": "media/Soft Repeat Logo.png"
     },
     "permissions": [
         "declarativeContent",
