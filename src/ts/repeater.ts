@@ -29,7 +29,6 @@ export class Repeater
 		this.repeaterBody.setAttribute("class", "repeater-body-renderer");
 		await this.Collapse();
 		parent.insertBefore(this.repeaterBody, parent.firstChild);
-		console.log(`Created repeater element at <${parent.tagName} id="${parent.id}" class="${parent.className}>`);
 
 		const [, fromInput] = await AddInputter(this.repeaterBody, "from");
 		const [, toInput] = await AddInputter(this.repeaterBody, "to");
@@ -55,8 +54,6 @@ export class Repeater
 
 	async Start(parent: HTMLElement): Promise<void>
 	{
-		console.log("Started RunRepeater");
-
 		const video = await TryGetElementByTag("video") as HTMLVideoElement;
 		const timeElems = await this.AddBody(parent);
 
@@ -87,7 +84,6 @@ export class Repeater
 		};
 		const onloop = (val: boolean) =>
 		{
-			console.log(`onloop(${val})`);
 			this.looping = val;
 			determine();
 		};
@@ -99,8 +95,6 @@ export class Repeater
 	{
 		const sleepTime = 1000;
 
-		console.log(`Entered loop. Video elem: ${video}`);
-
 		const inputSelected = timeInput.some((x) => x === document.activeElement);
 
 		const shouldExit = () => !this.looping || !this.playing;
@@ -109,14 +103,12 @@ export class Repeater
 
 		if (shouldExit())
 		{
-			console.log("Exited loop.");
 			return;
 		}
 
 		if (shouldSkip())
 		{
 			nextLoop();
-			console.log("Skipped loop.");
 			return;
 		}
 
@@ -128,13 +120,13 @@ export class Repeater
 		{
 			const duration = video.duration;
 			if (duration === Infinity)
-				throw new Error("Cannot loop a livestream.");
+				throw "Cannot loop a livestream.";
 			else if (!isNaN(duration) && duration && to > duration)
-				throw new Error("Selected duration is longer than the video.");
+				throw "Selected duration is longer than the video.";
 			else if (from < 0 || to < 0)
-				throw new Error("Duration cannot be under 0.");
+				throw "Duration cannot be under 0.";
 			else if (from > to)
-				throw new Error("From cannot be larger than To.");
+				throw "From cannot be larger than To.";
 		}
 		catch
 		{
@@ -149,7 +141,6 @@ export class Repeater
 		}
 		else if (time >= to - Repeater.lerpMilliDuration / 1000)
 		{
-			console.log(`fading out... time was: ${time}`);
 			await this.LerpVolume(video, 0);
 			video.currentTime = from;
 			await this.LerpVolume(video, 1);
