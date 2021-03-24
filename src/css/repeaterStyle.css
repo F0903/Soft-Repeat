@@ -4,8 +4,11 @@
   --secondary-bg-color: #181818;
   --secondary-fg-color: #999999;
 
-  animation: 200ms, ease-in-out;
+  transition: all 200ms ease-in-out;
 
+  max-width: fit-content;
+  max-height: 13px;
+  float: right;
   display: flex;
   flex-flow: row;
   padding: 5px;
@@ -34,7 +37,7 @@
   width: 28%;
   height: 100%;
 
-  vertical-align: 6%; /* To align with the god forsaken labels */
+  vertical-align: 3%; /* To align with the god forsaken labels */
 
   background-color: var(--secondary-bg-color);
 

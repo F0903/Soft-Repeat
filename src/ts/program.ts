@@ -1,5 +1,6 @@
 import { Repeater } from "./repeater";
-import { OnElementExists } from "./dom";
+import { OnElementExistsWithClass } from "./dom";
 
+//"menu-container"
 const repeater = new Repeater();
-OnElementExists("menu-container", async (x) => await repeater.Start(x));
+OnElementExistsWithClass("title style-scope ytd-video-primary-info-renderer", async (x) => await repeater.Start(x));

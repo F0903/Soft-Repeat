@@ -13,25 +13,29 @@ export class Repeater
 
 	async Expand(): Promise<void>
 	{
-		this.repeaterBody.hidden = false;
+		const body = this.repeaterBody;
+		body.style.opacity = "1";
 	}
 
 	async Collapse(): Promise<void>
 	{
-		this.repeaterBody.hidden = true;
+		const body = this.repeaterBody;
+		const style = body.style;
+		style.opacity = "0";
 	}
 
 	// Adds the control body of the repeater
 	async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
 	{
-		this.repeaterBody = document.createElement("div");
-		this.repeaterBody.setAttribute("id", "repeater-body");
-		this.repeaterBody.setAttribute("class", "repeater-body-renderer");
+		const body = this.repeaterBody = document.createElement("div");
+		body.setAttribute("id", "repeater-body");
+		body.setAttribute("class", "repeater-body-renderer");
 		await this.Collapse();
-		parent.insertBefore(this.repeaterBody, parent.firstChild);
+		parent.insertBefore(body, parent.firstChild);
+		console.log("Added repeater.");
 
-		const [, fromInput] = await AddInputter(this.repeaterBody, "from");
-		const [, toInput] = await AddInputter(this.repeaterBody, "to");
+		const [, fromInput] = await AddInputter(body, "from");
+		const [, toInput] = await AddInputter(body, "to");
 		return [fromInput as HTMLInputElement, toInput as HTMLInputElement];
 	}
 
@@ -151,7 +155,7 @@ export class Repeater
 	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void>
 	{
 		const firstVol = video.volume;
-		const iters = 100; // The amount of fractions to do it in.
+		const iters = 100; // The amount of iterations to do it in. (more = more smooth, but more expensive)
 		for (let i = 0; i <= iters; i++)
 		{
 			video.volume = firstVol - (firstVol - toValue) * (i / iters);

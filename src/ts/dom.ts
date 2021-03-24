@@ -11,10 +11,12 @@ export async function TryGetElementByTag(elemTag: string): Promise<Element>
 	}
 }
 
-export async function OnElementExists(elemId: string, onFound: (elem: HTMLElement) => void): Promise<void>
+export async function OnElementExistsWithClass(className: string, onFound: (elem: HTMLElement) => void): Promise<void>
 {
-	let elem = null;
-	while ((elem = document.getElementById(elemId)) === null)
+	const isNullOrUndef = (x: unknown) => x === null || x === undefined;
+
+	let elem: HTMLElement = null;
+	while (isNullOrUndef(elem = document.getElementsByClassName(className)[0] as HTMLElement))
 	{
 		await Sleep(20);
 	}
