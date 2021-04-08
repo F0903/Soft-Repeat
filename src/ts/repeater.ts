@@ -1,6 +1,56 @@
 import { Sleep } from "./util";
 import { TryGetElementByTag, AddInputter } from "./dom";
 import { OnAttributeChanged } from "./observer";
+
+class RepeaterBody
+{
+	readonly body: HTMLElement;
+	readonly fromInput: HTMLInputElement;
+	readonly toInput: HTMLInputElement;
+
+	readonly errorColor = "#ca3737dd";
+
+	constructor(body: HTMLElement, fromInput: HTMLInputElement, toInput: HTMLInputElement)
+	{
+		this.body = body;
+		this.fromInput = fromInput;
+		this.toInput = toInput;
+	}
+
+	async Expand(): Promise<void>
+	{
+		const body = this.body;
+		body.style.opacity = "1";
+	}
+
+	async Collapse(): Promise<void>
+	{
+		const body = this.body;
+		const style = body.style;
+		style.opacity = "0";
+	}
+
+	async SetFromInputError()
+	{
+		this.fromInput.setAttribute("style", `background-color: ${this.errorColor}`);
+	}
+
+	async SetToInputError()
+	{
+		this.toInput.setAttribute("style", `background-color: ${this.errorColor}`);
+	}
+
+	async ClearFromInputError()
+	{
+		this.fromInput.setAttribute("style", "");
+	}
+
+	async ClearToInputError()
+	{
+		this.toInput.setAttribute("style", "");
+	}
+}
+
 export class Repeater
 {
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
@@ -9,38 +59,26 @@ export class Repeater
 
 	private looping: boolean;
 
-	private repeaterBody: HTMLElement;
-
-	async Expand(): Promise<void>
-	{
-		const body = this.repeaterBody;
-		body.style.opacity = "1";
-	}
-
-	async Collapse(): Promise<void>
-	{
-		const body = this.repeaterBody;
-		const style = body.style;
-		style.opacity = "0";
-	}
+	private repeaterBody: RepeaterBody;
 
 	// Adds the control body of the repeater
-	async AddBody(parent: HTMLElement): Promise<[HTMLInputElement, HTMLInputElement]>
+	async AddBody(parent: HTMLElement): Promise<void>
 	{
-		const body = this.repeaterBody = document.createElement("div");
+		const body = document.createElement("div");
 		body.setAttribute("id", "repeater-body");
 		body.setAttribute("class", "repeater-body-renderer");
-		await this.Collapse();
 		parent.insertBefore(body, parent.firstChild);
-		console.log("Added repeater.");
 
 		const [, fromInput] = await AddInputter(body, "from");
 		const [, toInput] = await AddInputter(body, "to");
-		return [fromInput as HTMLInputElement, toInput as HTMLInputElement];
+
+		const rep = this.repeaterBody = new RepeaterBody(body, fromInput, toInput);
+		await rep.Collapse();
 	}
 
-	async GetLoopPeriod(elems:[from: HTMLInputElement, to: HTMLInputElement]): Promise<[number, number]>
+	async GetLoopPeriod(): Promise<[number, number]>
 	{
+		const elems = [this.repeaterBody.fromInput, this.repeaterBody.toInput];
 		const nums = elems.map((elem) =>
 		{
 			const input = elem.value;
@@ -59,51 +97,82 @@ export class Repeater
 	async Start(parent: HTMLElement): Promise<void>
 	{
 		const video = await TryGetElementByTag("video") as HTMLVideoElement;
-		const timeElems = await this.AddBody(parent);
+		await this.AddBody(parent);
 
 		this.playing = true;
 		this.looping = false;
 
-		const determine = () =>
+		const determine = async () =>
 		{
 			if (!this.looping)
 			{
-				this.Collapse();
+				await this.repeaterBody.Collapse();
 				return;
 			}
-			this.Expand();
+
+			await this.repeaterBody.Expand();
 			if (!this.playing)
 				return;
-			this.Loop(video, timeElems);
+			this.Loop(video);
 		};
-		video.onplay = () =>
+		video.onplay = async () =>
 		{
 			this.playing = true;
-			determine();
+			await determine();
 		};
-		video.onpause = () =>
+		video.onpause = async () =>
 		{
 			this.playing = false;
-			determine();
+			await determine();
 		};
-		const onloop = (val: boolean) =>
+		const onloop = async (val: boolean) =>
 		{
 			this.looping = val;
-			determine();
+			await determine();
 		};
 
 		OnAttributeChanged<boolean, HTMLVideoElement>(video, "loop", (x) => x.loop, onloop);
 	}
 
-	Loop = async (video: HTMLVideoElement, timeInput: [HTMLInputElement, HTMLInputElement]): Promise<void> =>
+	ErrorCheck(from: number, to: number, videoDuration: number): Promise<boolean>
+	{
+		let error = false;
+		if (from > videoDuration)
+		{
+			this.repeaterBody.SetFromInputError();
+			error = true;
+		}
+		else if (from > to) // From cannot be larger than To.
+		{
+			this.repeaterBody.SetFromInputError();
+			error = true;
+		}
+		else
+		{
+			this.repeaterBody.ClearFromInputError();
+		}
+
+		if (to > videoDuration)
+		{
+			this.repeaterBody.SetToInputError();
+			error = true;
+		}
+		else
+		{
+			this.repeaterBody.ClearToInputError();
+		}
+		return Promise.resolve(error);
+	}
+
+	Loop = async (video: HTMLVideoElement): Promise<void> =>
 	{
 		const sleepTime = 1000;
 
-		const inputSelected = timeInput.some((x) => x === document.activeElement);
+		const inputSelected = [this.repeaterBody.fromInput, this.repeaterBody.toInput].some((x) => x === document.activeElement);
 
 		const shouldExit = () => !this.looping || !this.playing;
 		const shouldSkip = () => inputSelected;
-		const nextLoop = () => setTimeout(this.Loop, sleepTime, video, timeInput);
+		const nextLoop = () => setTimeout(this.Loop, sleepTime, video);
 
 		if (shouldExit())
 		{
@@ -116,26 +185,20 @@ export class Repeater
 			return;
 		}
 
-		let [from, to] = await this.GetLoopPeriod(timeInput);
+		const videoDuration = video.duration;
+		if (videoDuration === Infinity) // Video is livestream.
+			return;
+		if (isNaN(videoDuration))
+			throw "video.duration was NaN";
+
+		let [from, to] = await this.GetLoopPeriod();
 		if (isNaN(from)) from = 0;
-		if (isNaN(to)) to = video.duration;
+		if (isNaN(to)) to = videoDuration;
 
-		try
+		if (await this.ErrorCheck(from, to, videoDuration))
 		{
-			const duration = video.duration;
-			if (duration === Infinity)
-				throw "Cannot loop a livestream.";
-			else if (!isNaN(duration) && duration && to > duration)
-				throw "Selected duration is longer than the video.";
-			else if (from < 0 || to < 0)
-				throw "Duration cannot be under 0.";
-			else if (from > to)
-				throw "From cannot be larger than To.";
-		}
-		catch
-		{
-			//TODO: Add error catching, and visually show what the user is doing wrong.
-
+			nextLoop();
+			return;
 		}
 
 		const time = video.currentTime;
@@ -149,6 +212,7 @@ export class Repeater
 			video.currentTime = from;
 			await this.LerpVolume(video, 1);
 		}
+
 		nextLoop();
 	}
 
