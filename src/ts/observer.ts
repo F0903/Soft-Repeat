@@ -9,7 +9,6 @@ export function OnAttributeChanged<T, E extends HTMLElement>(target: E, attName:
 	{
 		records.forEach((mut) =>
 		{
-			console.log(`mutation: att-name: ${mut.attributeName}`);
 			if (mut.attributeName != attName)
 			{
 				return;

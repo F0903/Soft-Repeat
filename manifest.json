@@ -9,7 +9,6 @@
         "128": "media/Soft Repeat Logo.png"
     },
     "permissions": [
-        "declarativeContent",
         "activeTab"
     ],
     "content_scripts": [
