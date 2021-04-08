@@ -17,10 +17,10 @@
                 "*://www.youtube.com/*"
             ],
             "css": [
-                "src/css/repeaterStyle.css"
+                "css/repeaterStyle.css"
             ],
             "js": [
-				"dist/js/main.js"
+				"js/main.js"
             ]
         }
     ],

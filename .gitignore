@@ -4,5 +4,6 @@
 inter/
 # Output
 dist/
+out/
 
 node_modules/

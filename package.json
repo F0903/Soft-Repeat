@@ -4,7 +4,7 @@
   "description": "Softly repeats YouTube videos. (wip)",
   "private": true,
   "scripts": {
-    "build": "npx tsc && npx webpack --mode=production",
+    "build": "npx tsc && npx webpack --mode=production && node buildaction.mjs",
     "dev": "npx tsc && npx webpack --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,6 +20,8 @@
     "webpack-cli": "^4.4.0"
   },
   "dependencies": {
-    "@types/chrome": "0.0.129"
+    "@types/chrome": "0.0.129",
+    "archiver": "^5.3.0",
+    "fs-extra": "^9.1.0"
   }
 }
