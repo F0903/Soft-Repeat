@@ -193,7 +193,7 @@ export class Repeater
 
 		let [from, to] = await this.GetLoopPeriod();
 		if (isNaN(from)) from = 0;
-		if (isNaN(to)) to = videoDuration;
+		if (isNaN(to)) to = videoDuration - 2;
 
 		if (await this.ErrorCheck(from, to, videoDuration))
 		{
@@ -218,7 +218,9 @@ export class Repeater
 
 	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void>
 	{
+		//TODO: Fix volume going to 100% even if its manually set to a lower value.
 		const firstVol = video.volume;
+		console.log(`Lerping... firstVol was ${firstVol}`);
 		const iters = 100; // The amount of iterations to do it in. (more = more smooth, but more expensive)
 		for (let i = 0; i <= iters; i++)
 		{
