@@ -1,7 +1,7 @@
 {
   "name": "soft-repeat",
   "version": "0.9.1",
-  "description": "Softly repeats YouTube videos. (wip)",
+  "description": "Softly repeats YouTube videos.",
   "private": true,
   "scripts": {
     "build": "npx tsc && npx webpack --mode=production && node buildaction.mjs",

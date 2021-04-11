@@ -166,6 +166,7 @@ export class Repeater
 
 	Loop = async (video: HTMLVideoElement): Promise<void> =>
 	{
+		console.log("Entered loop.");
 		const sleepTime = 1000;
 
 		const inputSelected = [this.repeaterBody.fromInput, this.repeaterBody.toInput].some((x) => x === document.activeElement);
@@ -208,9 +209,10 @@ export class Repeater
 		}
 		else if (time >= to - Repeater.lerpMilliDuration / 1000)
 		{
+			const lastVol = video.volume;
 			await this.LerpVolume(video, 0);
 			video.currentTime = from;
-			await this.LerpVolume(video, 1);
+			await this.LerpVolume(video, lastVol);
 		}
 
 		nextLoop();
@@ -218,9 +220,7 @@ export class Repeater
 
 	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void>
 	{
-		//TODO: Fix volume going to 100% even if its manually set to a lower value.
 		const firstVol = video.volume;
-		console.log(`Lerping... firstVol was ${firstVol}`);
 		const iters = 100; // The amount of iterations to do it in. (more = more smooth, but more expensive)
 		for (let i = 0; i <= iters; i++)
 		{

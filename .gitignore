@@ -1,9 +1,6 @@
 .vscode/
 
-# Intermediate
-inter/
 # Output
-dist/
 out/
 
 node_modules/

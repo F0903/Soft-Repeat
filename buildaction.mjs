@@ -3,13 +3,16 @@ import * as fse from "fs-extra";
 import { log } from "console";
 import archiver from "archiver";
 
-await fse.ensureDir("dist/css/");
-await fse.copy("src/css/", "dist/css/");
+// Handle css folder.
+await fse.ensureDir("out/dist/css/");
+await fse.copy("src/css/", "out/dist/css/");
 
-await fse.ensureDir("dist/media/");
-await fse.copy("media/", "dist/media/");
+// Handle media folder.
+await fse.ensureDir("out/dist/media/");
+await fse.copy("media/", "out/dist/media/");
 
-await fse.copy("manifest.json", "dist/manifest.json");
+// Copy manifest.
+await fse.copy("manifest.json", "out/dist/manifest.json");
 
 fse.ensureDir("out/");
 const out = createWriteStream("out/package.zip");
@@ -21,7 +24,7 @@ archive.on("error", (err) =>
 });
 
 archive.pipe(out);
-archive.directory("dist/", false);
+archive.directory("out/dist/", false);
 await archive.finalize();
 out.close();
 

@@ -1,9 +1,9 @@
 const path = require('path');
 
 module.exports = {
-  entry: "./inter/out_tsc/program.js",
+  entry: "./out/int/tsc/program.js",
   output: {
-    path: path.resolve("./dist/js/"),
+    path: path.resolve("./out/dist/js/"),
     filename: "main.js",
   },
 };
