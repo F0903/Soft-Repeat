@@ -56,8 +56,8 @@ export class Repeater
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
 
 	private playing: boolean;
-
 	private looping: boolean;
+	private running: boolean;
 
 	private repeaterBody: RepeaterBody;
 
@@ -102,33 +102,34 @@ export class Repeater
 		this.playing = true;
 		this.looping = false;
 
-		const determine = async () =>
+		video.onpause = async () =>
 		{
+			if (!this.playing)
+				return;
+
+			this.playing = false;
+			await this.repeaterBody.Collapse();
+		};
+		video.onplay = async () =>
+		{
+			if (this.playing)
+				return;
+
+			this.playing = true;
+			await this.repeaterBody.Expand();
+			this.StartLoop(video);
+		};
+		const onloop = async (val: boolean) =>
+		{
+			this.looping = val;
 			if (!this.looping)
 			{
 				await this.repeaterBody.Collapse();
 				return;
 			}
 
-			await this.repeaterBody.Expand();
-			if (!this.playing)
-				return;
-			this.Loop(video);
-		};
-		video.onplay = async () =>
-		{
-			this.playing = true;
-			await determine();
-		};
-		video.onpause = async () =>
-		{
-			this.playing = false;
-			await determine();
-		};
-		const onloop = async (val: boolean) =>
-		{
-			this.looping = val;
-			await determine();
+			this.repeaterBody.Expand();
+			this.StartLoop(video);
 		};
 
 		OnAttributeChanged<boolean, HTMLVideoElement>(video, "loop", (x) => x.loop, onloop);
@@ -164,9 +165,16 @@ export class Repeater
 		return Promise.resolve(error);
 	}
 
+	StartLoop(video: HTMLVideoElement): Promise<void>
+	{
+		if (this.running)
+			return;
+		this.running = true;
+		return this.Loop(video);
+	}
+
 	Loop = async (video: HTMLVideoElement): Promise<void> =>
 	{
-		console.log("Entered loop.");
 		const sleepTime = 1000;
 
 		const inputSelected = [this.repeaterBody.fromInput, this.repeaterBody.toInput].some((x) => x === document.activeElement);
@@ -177,6 +185,7 @@ export class Repeater
 
 		if (shouldExit())
 		{
+			this.running = false;
 			return;
 		}
 
@@ -188,7 +197,10 @@ export class Repeater
 
 		const videoDuration = video.duration;
 		if (videoDuration === Infinity) // Video is livestream.
+		{
+			this.running = false;
 			return;
+		}
 		if (isNaN(videoDuration))
 			throw "video.duration was NaN";
 
@@ -203,7 +215,7 @@ export class Repeater
 		}
 
 		const time = video.currentTime;
-		if (time <= from)
+		if (time < from)
 		{
 			video.currentTime = from;
 		}
@@ -227,6 +239,5 @@ export class Repeater
 			video.volume = firstVol - (firstVol - toValue) * (i / iters);
 			await Sleep(Repeater.lerpMilliDuration / iters);
 		}
-		return;
 	}
 }
