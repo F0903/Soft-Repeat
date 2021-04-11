@@ -101,35 +101,40 @@ export class Repeater
 
 		this.playing = true;
 		this.looping = false;
+		this.running = false;
 
-		video.onpause = async () =>
+		const determineLoop = async () =>
 		{
-			if (!this.playing)
-				return;
-
-			this.playing = false;
-			await this.repeaterBody.Collapse();
-		};
-		video.onplay = async () =>
-		{
-			if (this.playing)
-				return;
-
-			this.playing = true;
-			await this.repeaterBody.Expand();
-			this.StartLoop(video);
-		};
-		const onloop = async (val: boolean) =>
-		{
-			this.looping = val;
 			if (!this.looping)
 			{
 				await this.repeaterBody.Collapse();
 				return;
 			}
 
-			this.repeaterBody.Expand();
-			this.StartLoop(video);
+			await this.repeaterBody.Expand();
+			if (!this.playing || this.running)
+				return;
+			this.running = true;
+			await this.Loop(video);
+		};
+		video.onpause = async () =>
+		{
+			if (!this.playing)
+				return;
+			this.playing = false;
+			await determineLoop();
+		};
+		video.onplay = async () =>
+		{
+			if (this.playing)
+				return;
+			this.playing = true;
+			await determineLoop();
+		};
+		const onloop = async (val: boolean) =>
+		{
+			this.looping = val;
+			await determineLoop();
 		};
 
 		OnAttributeChanged<boolean, HTMLVideoElement>(video, "loop", (x) => x.loop, onloop);
@@ -163,14 +168,6 @@ export class Repeater
 			this.repeaterBody.ClearToInputError();
 		}
 		return Promise.resolve(error);
-	}
-
-	StartLoop(video: HTMLVideoElement): Promise<void>
-	{
-		if (this.running)
-			return;
-		this.running = true;
-		return this.Loop(video);
 	}
 
 	Loop = async (video: HTMLVideoElement): Promise<void> =>

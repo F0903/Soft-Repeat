@@ -4,9 +4,8 @@
   "description": "Softly repeats YouTube videos.",
   "private": true,
   "scripts": {
-    "build": "npx tsc && npx webpack --mode=production",
+    "build": "npx tsc && npx webpack --mode=production && node buildaction.mjs",
     "dev": "npx tsc && npx webpack --mode=development",
-	"pub": "npm run build && node buildaction.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
