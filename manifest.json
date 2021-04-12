@@ -8,9 +8,7 @@
         "48": "media/Soft Repeat Logo V2.png",
         "128": "media/Soft Repeat Logo V2.png"
     },
-    "permissions": [
-        "activeTab"
-    ],
+    "permissions": [],
     "content_scripts": [
         {
             "matches": [
