@@ -1,15 +1,13 @@
 {
-"compilerOptions": {
-	"module": "ES2020",
-	"lib": ["ES2020", "DOM"],
-	"outDir": "out/int/tsc/",
-	"target": "ES6",
-	"noImplicitAny": true,
-	"removeComments": true,
-	"preserveConstEnums": true,
-	"sourceMap": false
-},
-"include": [
-	"src/**/*"
-]
+	"compilerOptions": {
+		"module": "ES2020",
+		"lib": ["ES2020", "DOM"],
+		"outDir": "out/int/tsc/",
+		"target": "ES6",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": false
+	},
+	"include": ["src/**/*"]
 }

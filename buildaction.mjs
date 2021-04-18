@@ -18,8 +18,7 @@ fse.ensureDir("out/");
 const out = createWriteStream("out/package.zip");
 const archive = archiver("zip");
 
-archive.on("error", (err) =>
-{
+archive.on("error", (err) => {
 	throw err;
 });
 

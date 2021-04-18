@@ -1,26 +1,20 @@
 {
-    "name": "Soft Repeat",
-    "version": "0.9.2",
-    "description": "An extension that lets you repeat a YouTube video between two custom points in time, easily fading in and out.",
-    "icons": {
-        "16": "media/Soft Repeat Logo V2.png",
-        "32": "media/Soft Repeat Logo V2.png",
-        "48": "media/Soft Repeat Logo V2.png",
-        "128": "media/Soft Repeat Logo V2.png"
-    },
-    "permissions": [],
-    "content_scripts": [
-        {
-            "matches": [
-                "*://www.youtube.com/*"
-            ],
-            "css": [
-                "css/repeaterStyle.css"
-            ],
-            "js": [
-				"js/main.js"
-            ]
-        }
-    ],
-    "manifest_version": 3
+	"name": "Soft Repeat",
+	"version": "0.9.2",
+	"description": "An extension that lets you repeat a YouTube video between two custom points in time, easily fading in and out.",
+	"icons": {
+		"16": "media/Soft Repeat Logo V2.png",
+		"32": "media/Soft Repeat Logo V2.png",
+		"48": "media/Soft Repeat Logo V2.png",
+		"128": "media/Soft Repeat Logo V2.png"
+	},
+	"permissions": [],
+	"content_scripts": [
+		{
+			"matches": ["*://www.youtube.com/*"],
+			"css": ["css/repeaterStyle.css"],
+			"js": ["js/main.js"]
+		}
+	],
+	"manifest_version": 3
 }

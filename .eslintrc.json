@@ -1,34 +1,26 @@
 {
 	"root": true,
-	"plugins": [
-		"@typescript-eslint"
-	],
-    "extends": [
+	"env": {
+		"browser": true,
+		"es2020": true
+	},
+	"plugins": ["@typescript-eslint", "prettier"],
+	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:prettier/recommended",
 		"prettier"
 	],
-    "parser": "@typescript-eslint/parser",
-    "rules": {
-		"brace-style": [
-			"error",
-			"allman"
-		],
-        "indent": [
-            "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
-        "quotes": [
-            "error",
-            "double"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ]
-    }
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": 11,
+		"sourceType": "module"
+	},
+	"rules": {
+		"@typescript-eslint/indent": ["error", "tab"],
+		"linebreak-style": ["unix", "error"],
+		"quotes": ["error", "double"],
+		"semi": ["error", "always"],
+		"prettier/prettier": "error"
+	}
 }
