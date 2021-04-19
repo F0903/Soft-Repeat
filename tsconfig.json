@@ -5,6 +5,13 @@
 		"outDir": "out/int/tsc/",
 		"target": "ES6",
 		"noImplicitAny": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"strictBindCallApply": true,
+		"strictPropertyInitialization": true ,
+		"noImplicitThis": true,
+		"alwaysStrict": false,
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"sourceMap": false
