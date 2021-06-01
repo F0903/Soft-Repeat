@@ -1,11 +1,14 @@
 import { Sleep } from "./util";
 
-export async function TryGetElementByTag(elemTag: string): Promise<Element> {
+export async function TryGetElementByTag(
+	elemTag: string
+): Promise<Element | null> {
 	for (let attempt = 0; attempt < 3; attempt++) {
 		const elem = document.getElementsByTagName(elemTag)[0];
 		if (elem != null) return elem;
 		await Sleep(1000);
 	}
+	return null;
 }
 
 export async function OnElementExistsWithClass(
@@ -14,7 +17,7 @@ export async function OnElementExistsWithClass(
 ): Promise<void> {
 	const isNullOrUndef = (x: unknown) => x === null || x === undefined;
 
-	let elem: HTMLElement = null;
+	let elem;
 	while (
 		isNullOrUndef(
 			(elem = document.getElementsByClassName(className)[0] as HTMLElement)
