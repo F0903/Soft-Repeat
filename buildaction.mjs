@@ -5,14 +5,14 @@ import archiver from "archiver";
 
 // Handle css folder.
 await fse.ensureDir("out/dist/css/");
-await fse.copy("src/css/", "out/dist/css/");
+await fse.copy("src/css/", "out/dist/css/", { overwrite: true });
 
 // Handle media folder.
 await fse.ensureDir("out/dist/media/");
-await fse.copy("media/", "out/dist/media/");
+await fse.copy("media/", "out/dist/media/", { overwrite: true });
 
 // Copy manifest.
-await fse.copy("manifest.json", "out/dist/manifest.json");
+await fse.copy("manifest.json", "out/dist/manifest.json", { overwrite: true });
 
 fse.ensureDir("out/");
 const out = createWriteStream("out/package.zip");
