@@ -1,66 +1,18 @@
-import { Sleep } from "./util";
-import { TryGetElementByTag, AddInputter } from "./dom";
-import { OnAttributeChanged } from "./observer";
-
-class RepeaterBody {
-	readonly body: HTMLElement;
-	readonly fromInput: HTMLInputElement;
-	readonly toInput: HTMLInputElement;
-
-	readonly errorColor = "#ca3737dd";
-
-	constructor(
-		body: HTMLElement,
-		fromInput: HTMLInputElement,
-		toInput: HTMLInputElement
-	) {
-		this.body = body;
-		this.fromInput = fromInput;
-		this.toInput = toInput;
-	}
-
-	async Expand(): Promise<void> {
-		const body = this.body;
-		body.style.opacity = "1";
-	}
-
-	async Collapse(): Promise<void> {
-		const body = this.body;
-		const style = body.style;
-		style.opacity = "0";
-	}
-
-	async SetFromInputError() {
-		this.fromInput.setAttribute(
-			"style",
-			`background-color: ${this.errorColor}`
-		);
-	}
-
-	async SetToInputError() {
-		this.toInput.setAttribute("style", `background-color: ${this.errorColor}`);
-	}
-
-	async ClearFromInputError() {
-		this.fromInput.setAttribute("style", "");
-	}
-
-	async ClearToInputError() {
-		this.toInput.setAttribute("style", "");
-	}
-}
-
-export class Repeater {
+import { Sleep } from "./../utility/util";
+import { TryGetElementByTag, AddInputter } from "./../utility/dom";
+import { OnAttributeChanged } from "./../utility/observer";
+import RepeaterBody from "./repeater-body";
+export default class Repeater {
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
 
-	private playing: boolean;
-	private looping: boolean;
-	private running: boolean;
+	private playing: boolean = true;
+	private looping: boolean = false;
+	private running: boolean = false;
 
-	private repeaterBody: RepeaterBody;
+	private repeaterBody?: RepeaterBody;
 
 	// Adds the control body of the repeater
-	async AddBody(parent: HTMLElement): Promise<void> {
+	async AddBody(parent: HTMLElement): Promise<RepeaterBody> {
 		const body = document.createElement("div");
 		body.setAttribute("id", "repeater-body");
 		body.setAttribute("class", "repeater-body-renderer");
@@ -69,15 +21,13 @@ export class Repeater {
 		const [, fromInput] = await AddInputter(body, "from");
 		const [, toInput] = await AddInputter(body, "to");
 
-		const rep = (this.repeaterBody = new RepeaterBody(
-			body,
-			fromInput,
-			toInput
-		));
+		const rep = new RepeaterBody(body, fromInput, toInput);
 		await rep.Collapse();
+		return rep;
 	}
 
 	async GetLoopPeriod(): Promise<[number, number]> {
+		if (!this.repeaterBody) return [0, 0];
 		const elems = [this.repeaterBody.fromInput, this.repeaterBody.toInput];
 		const nums = elems.map((elem) => {
 			const input = elem.value;
@@ -94,13 +44,10 @@ export class Repeater {
 
 	async Start(parent: HTMLElement): Promise<void> {
 		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
-		await this.AddBody(parent);
-
-		this.playing = true;
-		this.looping = false;
-		this.running = false;
+		this.repeaterBody = await this.AddBody(parent);
 
 		const determineLoop = async () => {
+			if (!this.repeaterBody) return;
 			if (!this.looping) {
 				await this.repeaterBody.Collapse();
 				return;
@@ -139,6 +86,8 @@ export class Repeater {
 		to: number,
 		videoDuration: number
 	): Promise<boolean> {
+		if (!this.repeaterBody) return Promise.resolve(false);
+
 		let error = false;
 		if (from > videoDuration) {
 			this.repeaterBody.SetFromInputError();
@@ -161,6 +110,7 @@ export class Repeater {
 	}
 
 	Loop = async (video: HTMLVideoElement): Promise<void> => {
+		if (!this.repeaterBody) return;
 		const sleepTime = 1000;
 
 		const inputSelected = [
