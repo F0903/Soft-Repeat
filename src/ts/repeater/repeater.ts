@@ -12,7 +12,7 @@ export default class Repeater {
 	private repeaterBody?: RepeaterBody;
 
 	// Adds the control body of the repeater
-	async AddBody(parent: HTMLElement): Promise<RepeaterBody> {
+	private async AddBody(parent: HTMLElement): Promise<RepeaterBody> {
 		const body = document.createElement("div");
 		body.setAttribute("id", "repeater-body");
 		body.setAttribute("class", "repeater-body-renderer");
@@ -26,7 +26,7 @@ export default class Repeater {
 		return rep;
 	}
 
-	async GetLoopPeriod(): Promise<[number, number]> {
+	private async GetLoopPeriod(): Promise<[number, number]> {
 		if (!this.repeaterBody) return [0, 0];
 		const elems = [this.repeaterBody.fromInput, this.repeaterBody.toInput];
 		const nums = elems.map((elem) => {
@@ -42,46 +42,7 @@ export default class Repeater {
 		return [nums[0], nums[1]];
 	}
 
-	async Start(parent: HTMLElement): Promise<void> {
-		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
-		this.repeaterBody = await this.AddBody(parent);
-
-		const determineLoop = async () => {
-			if (!this.repeaterBody) return;
-			if (!this.looping) {
-				await this.repeaterBody.Collapse();
-				return;
-			}
-
-			await this.repeaterBody.Expand();
-			if (!this.playing || this.running) return;
-			this.running = true;
-			await this.Loop(video);
-		};
-		video.onpause = async () => {
-			if (!this.playing) return;
-			this.playing = false;
-			await determineLoop();
-		};
-		video.onplay = async () => {
-			if (this.playing) return;
-			this.playing = true;
-			await determineLoop();
-		};
-		const onloop = async (val: boolean) => {
-			this.looping = val;
-			await determineLoop();
-		};
-
-		OnAttributeChanged<boolean, HTMLVideoElement>(
-			video,
-			"loop",
-			(x) => x.loop,
-			onloop
-		);
-	}
-
-	ErrorCheck(
+	private ErrorCheck(
 		from: number,
 		to: number,
 		videoDuration: number
@@ -109,7 +70,7 @@ export default class Repeater {
 		return Promise.resolve(error);
 	}
 
-	Loop = async (video: HTMLVideoElement): Promise<void> => {
+	private Loop = async (video: HTMLVideoElement): Promise<void> => {
 		if (!this.repeaterBody) return;
 		const sleepTime = 1000;
 
@@ -162,12 +123,54 @@ export default class Repeater {
 		nextLoop();
 	};
 
-	async LerpVolume(video: HTMLVideoElement, toValue: number): Promise<void> {
+	private async LerpVolume(
+		video: HTMLVideoElement,
+		toValue: number
+	): Promise<void> {
 		const firstVol = video.volume;
 		const iters = 100; // The amount of iterations to do it in. (more = more smooth, but more expensive)
 		for (let i = 0; i <= iters; i++) {
 			video.volume = firstVol - (firstVol - toValue) * (i / iters);
 			await Sleep(Repeater.lerpMilliDuration / iters);
 		}
+	}
+
+	async Start(parent: HTMLElement): Promise<void> {
+		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
+		this.repeaterBody = await this.AddBody(parent);
+
+		const determineLoop = async () => {
+			if (!this.repeaterBody) return;
+			if (!this.looping) {
+				await this.repeaterBody.Collapse();
+				return;
+			}
+
+			await this.repeaterBody.Expand();
+			if (!this.playing || this.running) return;
+			this.running = true;
+			await this.Loop(video);
+		};
+		video.onpause = async () => {
+			if (!this.playing) return;
+			this.playing = false;
+			await determineLoop();
+		};
+		video.onplay = async () => {
+			if (this.playing) return;
+			this.playing = true;
+			await determineLoop();
+		};
+		const onloop = async (val: boolean) => {
+			this.looping = val;
+			await determineLoop();
+		};
+
+		OnAttributeChanged<boolean, HTMLVideoElement>(
+			video,
+			"loop",
+			(x) => x.loop,
+			onloop
+		);
 	}
 }
