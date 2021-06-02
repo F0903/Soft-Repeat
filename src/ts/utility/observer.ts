@@ -4,10 +4,6 @@ export function OnAttributeChanged<T, E extends HTMLElement>(
 	attGetter: (target: E) => T,
 	onChanged: (value: T) => void
 ): void {
-	//Note: Do not specify filter, since some attributes are not shown on the html element.
-	const obsSettings = {
-		attributes: true,
-	};
 	const obs = new MutationObserver((records) => {
 		records.forEach((mut) => {
 			if (mut.attributeName != attName) {
@@ -18,5 +14,7 @@ export function OnAttributeChanged<T, E extends HTMLElement>(
 			onChanged(val);
 		});
 	});
-	obs.observe(target, obsSettings);
+	obs.observe(target, {
+		attributes: true,
+	});
 }
