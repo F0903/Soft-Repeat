@@ -1,6 +1,6 @@
 {
 	"name": "soft-repeat",
-	"version": "0.9.2",
+	"version": "0.9.3",
 	"description": "Softly repeats YouTube videos.",
 	"private": true,
 	"scripts": {
