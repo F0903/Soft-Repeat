@@ -1,6 +1,6 @@
 {
 	"name": "soft-repeat",
-	"version": "0.9.3",
+	"version": "0.9.4",
 	"description": "Softly repeats YouTube videos.",
 	"private": true,
 	"scripts": {
@@ -23,7 +23,6 @@
 	},
 	"dependencies": {
 		"@types/chrome": "0.0.129",
-		"archiver": "^5.3.0",
-		"fs-extra": "^9.1.0"
+		"archiver": "^5.3.0"
 	}
 }

@@ -1,5 +1,5 @@
 import { Sleep } from "./../utility/util";
-import { TryGetElementByTag, AddInputter } from "./../utility/dom";
+import { TryGetElementByTag } from "./../utility/dom";
 import { OnAttributeChanged } from "./../utility/observer";
 import RepeaterBody from "./repeater-body";
 export default class Repeater {
@@ -10,23 +10,6 @@ export default class Repeater {
 	private running: boolean = false;
 
 	private repeaterBody?: RepeaterBody;
-
-	// Adds the control body of the repeater
-	private async AddBody(parent: HTMLElement): Promise<RepeaterBody> {
-		const body = document.createElement("div");
-		body.setAttribute("id", "repeater-body");
-		body.setAttribute("class", "repeater-body-renderer");
-		parent.insertBefore(body, parent.firstChild);
-
-		const [, fromInput] = await AddInputter(body, "from");
-		const [, toInput] = await AddInputter(body, "to");
-		fromInput.setAttribute("placeholder", "00:00");
-		toInput.setAttribute("placeholder", "00:00");
-
-		const rep = new RepeaterBody(body, fromInput, toInput);
-		await rep.Collapse();
-		return rep;
-	}
 
 	private async GetLoopPeriod(): Promise<[number, number]> {
 		if (!this.repeaterBody) return [0, 0];
@@ -139,7 +122,7 @@ export default class Repeater {
 
 	async Start(parent: HTMLElement): Promise<void> {
 		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
-		this.repeaterBody = await this.AddBody(parent);
+		this.repeaterBody = await RepeaterBody.AddBody(parent);
 
 		const determineLoop = async () => {
 			if (!this.repeaterBody) return;
