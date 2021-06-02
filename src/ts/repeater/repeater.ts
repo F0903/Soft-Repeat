@@ -20,6 +20,8 @@ export default class Repeater {
 
 		const [, fromInput] = await AddInputter(body, "from");
 		const [, toInput] = await AddInputter(body, "to");
+		fromInput.setAttribute("placeholder", "00:00");
+		toInput.setAttribute("placeholder", "00:00");
 
 		const rep = new RepeaterBody(body, fromInput, toInput);
 		await rep.Collapse();
