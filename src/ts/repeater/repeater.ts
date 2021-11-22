@@ -2,6 +2,7 @@ import { Sleep } from "./../utility/util";
 import { TryGetElementByTag } from "./../utility/dom";
 import { OnAttributeChanged } from "./../utility/observer";
 import RepeaterBody from "./repeater-body";
+
 export default class Repeater {
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
 

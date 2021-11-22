@@ -1,7 +1,5 @@
+import "../js/fontawesome.js";
 import Repeater from "./repeater/repeater";
-import { OnElementExistsWithClass } from "./utility/dom";
+import { OnElementExists } from "./utility/dom";
 
-OnElementExistsWithClass(
-	"title style-scope ytd-video-primary-info-renderer",
-	async (x) => new Repeater().Start(x)
-);
+OnElementExists("div.ytp-left-controls", async (x) => new Repeater().Start(x));

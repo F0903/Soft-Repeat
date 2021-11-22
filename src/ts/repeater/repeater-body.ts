@@ -1,5 +1,3 @@
-import { AddInputter } from "../utility/dom";
-
 export default class RepeaterBody {
 	readonly body: HTMLElement;
 	readonly fromInput: HTMLInputElement;
@@ -18,16 +16,16 @@ export default class RepeaterBody {
 	}
 
 	static async AddBody(parent: HTMLElement): Promise<RepeaterBody> {
-		const body = document.createElement("div");
-		body.setAttribute("id", "repeater-body");
-		body.setAttribute("class", "repeater-body-renderer");
-		parent.insertBefore(body, parent.firstChild);
+		const url = chrome.runtime.getURL("html/repeater.html");
+		const response = await fetch(url);
+		const html = await response.text();
+		parent.insertAdjacentHTML("afterbegin", html);
 
-		const [, fromInput] = await AddInputter(body, "from");
-		const [, toInput] = await AddInputter(body, "to");
-		fromInput.setAttribute("placeholder", "00:00");
-		toInput.setAttribute("placeholder", "00:00");
-
+		const body = parent.querySelector("div.repeater") as HTMLDivElement;
+		const fromInput = parent.querySelector(
+			"input#from-input"
+		) as HTMLInputElement;
+		const toInput = parent.querySelector("input#to-input") as HTMLInputElement;
 		const rep = new RepeaterBody(body, fromInput, toInput);
 		await rep.Collapse();
 		return rep;
