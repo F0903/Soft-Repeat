@@ -13,15 +13,15 @@ export async function TryGetElementByTag(
 
 export async function OnElementExists(
 	selector: string,
-	onFound: (elem: HTMLElement) => void
+	onFound: (elem: HTMLElement) => void,
+	wait_delay = 20
 ): Promise<void> {
 	const isNullOrUndef = (x: unknown) => x === null || x === undefined;
-
 	let elem;
 	while (
 		isNullOrUndef((elem = document.querySelector(selector) as HTMLElement))
 	) {
-		await Sleep(20);
+		await Sleep(wait_delay);
 	}
 	onFound(elem);
 }

@@ -1,7 +1,8 @@
 import copy from "rollup-plugin-copy";
+import nodeResolve from "@rollup/plugin-node-resolve";
 
 export default {
-	input: "out/tsc/ts/program.js",
+	input: "out/tsc/program.js",
 	output: {
 		file: "out/dist/main.js",
 		format: "iife",
@@ -15,5 +16,6 @@ export default {
 				{ src: "manifest.json", dest: "out/dist" },
 			],
 		}),
+		nodeResolve(),
 	],
 };

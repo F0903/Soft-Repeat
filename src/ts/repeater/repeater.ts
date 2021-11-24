@@ -121,13 +121,24 @@ export default class Repeater {
 		}
 	}
 
-	async Start(parent: HTMLElement): Promise<void> {
-		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
-		this.repeaterBody = await RepeaterBody.AddBody(parent);
+	async Start(sibling: HTMLElement, positon: InsertPosition): Promise<void> {
+		this.repeaterBody = await RepeaterBody.AddBody(sibling, positon);
 
-		const determineLoop = async () => {
+		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
+		video.onpause = async () => {
+			if (!this.playing) return;
+			this.playing = false;
+			await manageLoop();
+		};
+		video.onplay = async () => {
+			if (this.playing) return;
+			this.playing = true;
+			await manageLoop();
+		};
+
+		const manageLoop = async (loopValue: boolean = this.looping) => {
 			if (!this.repeaterBody) return;
-			if (!this.looping) {
+			if (!loopValue) {
 				await this.repeaterBody.Collapse();
 				return;
 			}
@@ -135,28 +146,15 @@ export default class Repeater {
 			await this.repeaterBody.Expand();
 			if (!this.playing || this.running) return;
 			this.running = true;
+			this.looping = loopValue;
 			await this.Loop(video);
-		};
-		video.onpause = async () => {
-			if (!this.playing) return;
-			this.playing = false;
-			await determineLoop();
-		};
-		video.onplay = async () => {
-			if (this.playing) return;
-			this.playing = true;
-			await determineLoop();
-		};
-		const onloop = async (val: boolean) => {
-			this.looping = val;
-			await determineLoop();
 		};
 
 		OnAttributeChanged<boolean, HTMLVideoElement>(
 			video,
 			"loop",
 			(x) => x.loop,
-			onloop
+			manageLoop
 		);
 	}
 }

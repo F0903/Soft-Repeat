@@ -15,6 +15,7 @@
 		"preserveConstEnums": true,
 		"sourceMap": false,
 		"allowJs": true,
+		"moduleResolution": "node"
 	},
 	"include": ["src/**/*"]
 }

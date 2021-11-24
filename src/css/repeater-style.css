@@ -1,41 +1,103 @@
 .repeater {
-	--primary-bg-color: #303030;
-	--primary-fg-color: #aaaaaa;
-	--secondary-bg-color: #181818;
-	--secondary-fg-color: #999999;
+	--primary-color: #eee;
+	--background-color: rgba(153, 153, 153, 0.233);
+	--background-color-hover: rgba(255, 255, 255, 0.1);
 
-	justify-self: flex-end;
-	height: 90%;
-	width: fit-content;
-	display: flex;
-	flex-flow: column;
-	place-items: center flex-start;
-	padding: 5px;
-	border-radius: 2px;
-	background-color: var(--primary-bg-color);
+	--primary-font-size: 19px;
+
+	margin: 0px;
+	padding: 0px 0px 5px 0px;
 	font-family: Roboto;
-	font-size: 18px;
-	font-weight: 500;
-	text-align: center;
-	color: var(--primary-fg-color);
+	font-size: var(--primary-font-size);
+	font-weight: 400;
+	text-align: left;
+	color: var(--primary-color);
 }
 
-.repeater-collapser {
-	place-self: center center;
-	width: 50px;
+.repeater:hover {
+	background: transparent !important;
+	cursor: default !important;
+}
+
+.repeater-spacer {
+	height: calc(100% + 10px);
+}
+
+.repeater-icon-container {
+	padding: 0px 10px 0px 11px;
+}
+
+.repeater-icon {
+	--icon-button-size: 50px;
+	height: var(--icon-button-size);
+	max-height: var(--icon-button-size);
+	width: var(--icon-button-size);
+	max-width: var(--icon-button-size);
+	font-size: calc(var(--icon-button-size) - 25px);
+	border-radius: 50%;
+	display: flex;
+	place-items: center;
+	place-content: center;
+	cursor: pointer;
+}
+
+.repeater-icon:hover {
+	background-color: var(--background-color-hover);
 }
 
 .repeater-body {
-	display: none;
+	position: relative;
+	padding: 7px !important;
+	margin: 0px 20px;
+	border: 2px solid var(--primary-color);
+	border-radius: 10px;
+}
+
+.repeater-body-input-container {
+	margin-bottom: 4px;
+	padding: 0px 5px;
 }
 
 .repeater-body-input {
+	height: calc(100% + 4px);
+	width: calc(100% - 4px);
 	outline: none;
 	border: 0px;
 	border-radius: 3px;
-	background-color: var(--secondary-bg-color);
+	background-color: var(--background-color);
+	font-size: 16px;
+	font-family: Roboto;
+	font-weight: 400;
+	text-align: center;
+	color: var(--primary-color);
 }
 
 .repeater-body-divider {
-	margin: 5px 0px;
+	--divider-height: 2px;
+	--divider-width: 50%;
+	width: var(--divider-width);
+	height: var(--divider-height);
+	margin-left: calc((100% - var(--divider-width)) / 2);
+	background-color: var(--primary-color);
+}
+
+.underscore {
+	--underscore-height: 2px;
+	position: relative;
+}
+
+.underscore::after {
+	content: "";
+	top: calc(100% - var(--underscore-height));
+	height: var(--underscore-height);
+	width: 100%;
+	background-color: var(--primary-color);
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.hide {
+	display: none;
 }
