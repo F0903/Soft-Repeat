@@ -13,7 +13,6 @@
 		{
 			"matches": ["*://www.youtube.com/*"],
 			"css": ["css/repeater-style.css"],
-			"run_at": "document_start",
 			"js": ["main.js"]
 		}
 	],
