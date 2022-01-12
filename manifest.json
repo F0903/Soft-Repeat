@@ -12,6 +12,7 @@
 	"content_scripts": [
 		{
 			"matches": ["*://www.youtube.com/*"],
+			"run_at": "document_end",
 			"css": ["css/repeater-style.css"],
 			"js": ["main.js"]
 		}

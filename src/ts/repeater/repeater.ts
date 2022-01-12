@@ -6,9 +6,9 @@ import RepeaterBody from "./repeater-body";
 export default class Repeater {
 	private static readonly lerpMilliDuration = 3000; // The duration of the lerp.
 
-	private playing: boolean = true;
-	private looping: boolean = false;
-	private loopInProgress: boolean = false;
+	private stopping: boolean = false;
+	private enabled: boolean = false;
+	private checkInProgress: boolean = false;
 
 	private repeaterBody?: RepeaterBody;
 
@@ -56,34 +56,43 @@ export default class Repeater {
 		return Promise.resolve(error);
 	}
 
-	private Loop = async (video: HTMLVideoElement): Promise<void> => {
+	private IsInputSelected = () =>
+		this.repeaterBody!.GetInputs().some((x) => x === document.activeElement);
+
+	private ShouldExitCheck = () => !this.enabled || this.stopping;
+
+	private ShouldSkipCheck = () => this.IsInputSelected();
+
+	private CanCheck(): boolean {
+		return this.enabled;
+	}
+
+	private CheckLoop = async (video: HTMLVideoElement): Promise<void> => {
 		if (!this.repeaterBody) return;
 		const sleepTime = 1000;
 
-		const inputSelected = this.repeaterBody
-			.GetInputs()
-			.some((x) => x === document.activeElement);
+		console.log("Running check");
 
-		const shouldExit = () => !this.looping || !this.playing;
-		const shouldSkip = () => inputSelected;
-		const nextLoop = () => setTimeout(this.Loop, sleepTime, video);
+		const nextCheck = () => setTimeout(this.CheckLoop, sleepTime, video);
 
-		this.loopInProgress = true;
+		this.checkInProgress = true;
 
-		if (shouldExit()) {
-			this.loopInProgress = false;
+		if (this.ShouldExitCheck()) {
+			console.log("Exiting check.");
+			this.checkInProgress = false;
+			this.stopping = false;
 			return;
 		}
 
-		if (shouldSkip()) {
-			nextLoop();
+		if (this.ShouldSkipCheck()) {
+			nextCheck();
 			return;
 		}
 
 		const videoDuration = video.duration;
 		if (videoDuration === Infinity) {
 			// Video is livestream.
-			this.loopInProgress = false;
+			this.checkInProgress = false;
 			return;
 		}
 		if (isNaN(videoDuration)) throw "video.duration was NaN";
@@ -93,7 +102,7 @@ export default class Repeater {
 		if (isNaN(to)) to = videoDuration - 2;
 
 		if (await this.ErrorCheck(from, to, videoDuration)) {
-			nextLoop();
+			nextCheck();
 			return;
 		}
 
@@ -107,7 +116,7 @@ export default class Repeater {
 			await this.LerpVolume(video, lastVol);
 		}
 
-		nextLoop();
+		nextCheck();
 	};
 
 	private async LerpVolume(
@@ -132,34 +141,35 @@ export default class Repeater {
 
 		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
 
-		const stopLoop = async () => {
+		const stopCheck = async () => {
 			console.log("Stopping Loop");
-			if (!this.loopInProgress) return;
-			icon.classList.toggle("fancyfy", false);
+			if (!this.checkInProgress) return;
+			this.stopping = true;
 		};
 
-		const startLoop = async () => {
-			if (!repeater) return;
-
+		const startCheck = async () => {
 			console.log("Starting Loop");
-			if (this.loopInProgress) return;
-			icon.classList.toggle("fancyfy", true);
-			await this.Loop(video);
+			if (this.checkInProgress) return;
+			await this.CheckLoop(video);
+			console.log("STARTLOOP EXIT");
 		};
 
-		icon.addEventListener("click", () => startLoop());
+		icon.addEventListener("click", () => {
+			const state = (this.enabled = !this.enabled);
+			console.log(`icon toggle ${state}`);
+			icon.classList.toggle("repeater-icon-glow", state);
+		});
 
 		video.onpause = async () => {
-			console.log("Pause");
-			if (!this.playing) return;
-			this.playing = false;
-			await stopLoop();
+			await stopCheck();
 		};
 		video.onplay = async () => {
-			console.log("Play");
-			if (this.playing) return;
-			this.playing = true;
-			await startLoop();
+			console.log(`stopping: ${this.stopping}`);
+			console.log(`enabled: ${this.enabled}`);
+			console.log(`can check: ${this.CanCheck()}`);
+
+			if (!this.CanCheck()) return;
+			await startCheck();
 		};
 	}
 }

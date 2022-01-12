@@ -11,9 +11,9 @@
 	},
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "*",
+		"@types/estree": "*",
 		"@typescript-eslint/eslint-plugin": "*",
 		"@typescript-eslint/parser": "*",
-		"@types/estree": "*",
 		"eslint": "*",
 		"eslint-config-prettier": "*",
 		"eslint-plugin-prettier": "*",
@@ -25,7 +25,8 @@
 		"webpack-cli": "^4.9"
 	},
 	"dependencies": {
-		"@fortawesome/fontawesome-free": "^5.15",
+		"@fortawesome/fontawesome-svg-core": "^1.2.36",
+		"@fortawesome/free-solid-svg-icons": "^5.15.4",
 		"@types/chrome": "^0.0.129",
 		"archiver": "^5.3"
 	}

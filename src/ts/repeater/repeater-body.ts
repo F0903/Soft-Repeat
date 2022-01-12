@@ -1,3 +1,6 @@
+import { library, dom } from "@fortawesome/fontawesome-svg-core";
+import { faRedoAlt } from "@fortawesome/free-solid-svg-icons";
+
 export default class RepeaterBody {
 	private readonly body: HTMLElement;
 	public readonly FromInput: HTMLInputElement;
@@ -30,6 +33,9 @@ export default class RepeaterBody {
 			"input#from-input"
 		) as HTMLInputElement;
 		const toInput = body.querySelector("input#to-input") as HTMLInputElement;
+
+		library.add(faRedoAlt);
+		dom.i2svg();
 
 		const rep = new RepeaterBody(body, fromInput, toInput);
 		return rep;
