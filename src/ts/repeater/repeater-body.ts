@@ -1,9 +1,7 @@
 export default class RepeaterBody {
-	readonly body: HTMLElement;
-	readonly fromInput: HTMLInputElement;
-	readonly toInput: HTMLInputElement;
-
-	readonly errorColor = "#ca3737dd";
+	private readonly body: HTMLElement;
+	public readonly FromInput: HTMLInputElement;
+	public readonly ToInput: HTMLInputElement;
 
 	private constructor(
 		body: HTMLElement,
@@ -11,9 +9,8 @@ export default class RepeaterBody {
 		toInput: HTMLInputElement
 	) {
 		this.body = body;
-		this.fromInput = fromInput;
-		this.toInput = toInput;
-		this.SetupHandlers();
+		this.FromInput = fromInput;
+		this.ToInput = toInput;
 	}
 
 	static async AddBody(
@@ -38,38 +35,15 @@ export default class RepeaterBody {
 		return rep;
 	}
 
-	private SetupHandlers() {}
-
-	private OnCollapserClick() {
-		console.log("Hello!");
+	GetInputs(): [HTMLInputElement, HTMLInputElement] {
+		return [this.FromInput, this.ToInput];
 	}
 
-	async Expand(): Promise<void> {
-		const body = this.body;
-		body.classList.remove("hide");
+	GetBody(): HTMLElement {
+		return this.body;
 	}
 
-	async Collapse(): Promise<void> {
-		const body = this.body;
-		body.classList.add("hide");
-	}
-
-	async SetFromInputError() {
-		this.fromInput.setAttribute(
-			"style",
-			`background-color: ${this.errorColor}`
-		);
-	}
-
-	async SetToInputError() {
-		this.toInput.setAttribute("style", `background-color: ${this.errorColor}`);
-	}
-
-	async ClearFromInputError() {
-		this.fromInput.setAttribute("style", "");
-	}
-
-	async ClearToInputError() {
-		this.toInput.setAttribute("style", "");
+	SetInputError(element: HTMLInputElement, value: boolean = true) {
+		element.classList.toggle("error", value);
 	}
 }

@@ -1,6 +1,6 @@
 <div class="repeater ytp-menuitem" role="menuitem">
 	<div class="repeater-icon-container ytp-menuitem-icon">
-		<div class="repeater-icon">
+		<div class="repeater-icon clickable">
 			<i class="fas fa-redo-alt"></i>
 		</div>
 	</div>
@@ -9,6 +9,7 @@
 			<input
 				class="repeater-body-input underscore"
 				id="from-input"
+				pattern="((\d+)*:*)+"
 				placeholder="xx:xx"
 			/>
 		</div>
@@ -17,6 +18,7 @@
 			<input
 				class="repeater-body-input underscore"
 				id="to-input"
+				pattern="((\d+)*:*)+"
 				placeholder="xx:xx"
 			/>
 		</div>

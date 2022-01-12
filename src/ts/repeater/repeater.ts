@@ -8,13 +8,13 @@ export default class Repeater {
 
 	private playing: boolean = true;
 	private looping: boolean = false;
-	private running: boolean = false;
+	private loopInProgress: boolean = false;
 
 	private repeaterBody?: RepeaterBody;
 
 	private async GetLoopPeriod(): Promise<[number, number]> {
 		if (!this.repeaterBody) return [0, 0];
-		const elems = [this.repeaterBody.fromInput, this.repeaterBody.toInput];
+		const elems = this.repeaterBody.GetInputs();
 		const nums = elems.map((elem) => {
 			const input = elem.value;
 			const splits = input.split(":");
@@ -37,21 +37,21 @@ export default class Repeater {
 
 		let error = false;
 		if (from > videoDuration) {
-			this.repeaterBody.SetFromInputError();
+			this.repeaterBody.SetInputError(this.repeaterBody.FromInput);
 			error = true;
 		} else if (from > to) {
 			// From cannot be larger than To.
-			this.repeaterBody.SetFromInputError();
+			this.repeaterBody.SetInputError(this.repeaterBody.FromInput);
 			error = true;
 		} else {
-			this.repeaterBody.ClearFromInputError();
+			this.repeaterBody.SetInputError(this.repeaterBody.FromInput, false);
 		}
 
 		if (to > videoDuration) {
-			this.repeaterBody.SetToInputError();
+			this.repeaterBody.SetInputError(this.repeaterBody.ToInput);
 			error = true;
 		} else {
-			this.repeaterBody.ClearToInputError();
+			this.repeaterBody.SetInputError(this.repeaterBody.FromInput, false);
 		}
 		return Promise.resolve(error);
 	}
@@ -60,17 +60,18 @@ export default class Repeater {
 		if (!this.repeaterBody) return;
 		const sleepTime = 1000;
 
-		const inputSelected = [
-			this.repeaterBody.fromInput,
-			this.repeaterBody.toInput,
-		].some((x) => x === document.activeElement);
+		const inputSelected = this.repeaterBody
+			.GetInputs()
+			.some((x) => x === document.activeElement);
 
 		const shouldExit = () => !this.looping || !this.playing;
 		const shouldSkip = () => inputSelected;
 		const nextLoop = () => setTimeout(this.Loop, sleepTime, video);
 
+		this.loopInProgress = true;
+
 		if (shouldExit()) {
-			this.running = false;
+			this.loopInProgress = false;
 			return;
 		}
 
@@ -82,7 +83,7 @@ export default class Repeater {
 		const videoDuration = video.duration;
 		if (videoDuration === Infinity) {
 			// Video is livestream.
-			this.running = false;
+			this.loopInProgress = false;
 			return;
 		}
 		if (isNaN(videoDuration)) throw "video.duration was NaN";
@@ -121,40 +122,44 @@ export default class Repeater {
 		}
 	}
 
-	async Start(sibling: HTMLElement, positon: InsertPosition): Promise<void> {
-		this.repeaterBody = await RepeaterBody.AddBody(sibling, positon);
+	async Init(sibling: HTMLElement, positon: InsertPosition): Promise<void> {
+		const repeater = (this.repeaterBody = await RepeaterBody.AddBody(
+			sibling,
+			positon
+		));
+		const body = repeater.GetBody();
+		const icon = body.querySelector("div.repeater-icon") as HTMLElement;
 
 		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
-		video.onpause = async () => {
-			if (!this.playing) return;
-			this.playing = false;
-			await manageLoop();
-		};
-		video.onplay = async () => {
-			if (this.playing) return;
-			this.playing = true;
-			await manageLoop();
+
+		const stopLoop = async () => {
+			console.log("Stopping Loop");
+			if (!this.loopInProgress) return;
+			icon.classList.toggle("fancyfy", false);
 		};
 
-		const manageLoop = async (loopValue: boolean = this.looping) => {
-			if (!this.repeaterBody) return;
-			if (!loopValue) {
-				await this.repeaterBody.Collapse();
-				return;
-			}
+		const startLoop = async () => {
+			if (!repeater) return;
 
-			await this.repeaterBody.Expand();
-			if (!this.playing || this.running) return;
-			this.running = true;
-			this.looping = loopValue;
+			console.log("Starting Loop");
+			if (this.loopInProgress) return;
+			icon.classList.toggle("fancyfy", true);
 			await this.Loop(video);
 		};
 
-		OnAttributeChanged<boolean, HTMLVideoElement>(
-			video,
-			"loop",
-			(x) => x.loop,
-			manageLoop
-		);
+		icon.addEventListener("click", () => startLoop());
+
+		video.onpause = async () => {
+			console.log("Pause");
+			if (!this.playing) return;
+			this.playing = false;
+			await stopLoop();
+		};
+		video.onplay = async () => {
+			console.log("Play");
+			if (this.playing) return;
+			this.playing = true;
+			await startLoop();
+		};
 	}
 }
