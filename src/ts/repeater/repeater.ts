@@ -84,8 +84,10 @@ export default class Repeater {
 		};
 
 		icon.addEventListener("click", async () => {
+			console.log("DBG: ONCLICK");
 			const state = (this.enabled = !this.enabled);
-			if (!state) stopCheckLoop();
+			if (state) startCheckLoop();
+			else stopCheckLoop();
 			console.log(`icon toggle ${state}`);
 			icon.classList.toggle("repeater-icon-glow", state);
 		});

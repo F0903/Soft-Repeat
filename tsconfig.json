@@ -4,6 +4,7 @@
 		"lib": ["ES2020", "DOM"],
 		"outDir": "out/tsc/",
 		"target": "ES6",
+		"incremental": true,
 		"noImplicitAny": true,
 		"strict": true,
 		"strictNullChecks": true,

@@ -3,13 +3,11 @@ import KeyBlocker from "./utility/keyblocker";
 import { OnAttributeChanged } from "./utility/observer";
 import { OnElementExists } from "./utility/dom";
 
-//TODO: Fix check exiting when scrubbing.
-//TODO: Fix key blocking only working when first opening menu, then clicking off again.
-
 let repeater: Repeater; // To be sure it wont be GC'd
 
 function ManageKeyBlocker(menu: HTMLElement) {
 	KeyBlocker.Init();
+	KeyBlocker.SetBlock(true);
 
 	OnAttributeChanged(
 		menu,
