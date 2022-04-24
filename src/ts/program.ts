@@ -19,16 +19,14 @@ function InitKeyBlocker(menu: HTMLElement) {
 	);
 }
 
-
 function OnMenuExists(elem: HTMLElement) {
-	const height = "308px";
+	const height = "305px";
 	elem.style.height = height;
 	(elem.firstElementChild as HTMLElement).style.height = height;
 	InitKeyBlocker(elem);
 }
 
 OnElementExists("body > div.ytp-popup.ytp-contextmenu", OnMenuExists);
-
 
 function OnMenuPanelExists(elem: HTMLElement) {
 	const newParent = elem.nextSibling as HTMLElement;

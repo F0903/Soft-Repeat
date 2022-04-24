@@ -1,5 +1,8 @@
 import { library, dom } from "@fortawesome/fontawesome-svg-core";
-import { faRedoAlt, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {
+	faArrowRotateRight,
+	faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default class RepeaterBody {
 	private readonly body: HTMLElement;
@@ -17,7 +20,7 @@ export default class RepeaterBody {
 	}
 
 	static AddIcons() {
-		library.add(faRedoAlt);
+		library.add(faArrowRotateRight);
 		library.add(faArrowRight);
 		dom.i2svg();
 	}

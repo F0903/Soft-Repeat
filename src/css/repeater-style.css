@@ -25,20 +25,26 @@
 }
 
 .repeater-icon-container {
-	padding: 0px 10px 0px 11px;
+	padding: 0px 10px 0px 6px !important;
 }
 
 .repeater-icon {
-	--icon-button-size: 40px;
+	--icon-button-size: 20px;
 	height: var(--icon-button-size);
 	max-height: var(--icon-button-size);
 	width: var(--icon-button-size);
 	max-width: var(--icon-button-size);
-	font-size: calc(var(--icon-button-size) - 15px);
 	border-radius: 50%;
-	display: flex;
-	place-items: center;
-	place-content: center;
+	padding: 6px;
+}
+
+.repeater-icon > svg {
+	/* Font size does not want to work, so we use this hack instead. */
+	height: var(--icon-button-size);
+	max-height: var(--icon-button-size);
+	width: var(--icon-button-size);
+	max-width: var(--icon-button-size);
+	transform: translate(-0.5px, 0.5px);
 }
 
 .repeater-icon-glow {
@@ -53,8 +59,7 @@
 	display: flex !important;
 	flex-direction: row;
 	position: relative;
-	padding: 7px !important;
-	margin: 0px 20px;
+	padding: 7px 0px !important;
 	max-height: 40px;
 	max-width: 369px;
 }
