@@ -5,7 +5,7 @@ import { OnElementExists } from "./utility/dom";
 
 let repeater: Repeater; // To be sure it wont be GC'd
 
-function ManageKeyBlocker(menu: HTMLElement) {
+function InitKeyBlocker(menu: HTMLElement) {
 	KeyBlocker.Init();
 	KeyBlocker.SetBlock(true);
 
@@ -19,14 +19,18 @@ function ManageKeyBlocker(menu: HTMLElement) {
 	);
 }
 
-OnElementExists("body > div.ytp-popup.ytp-contextmenu", (x) => {
-	const height = "343px";
-	x.style.height = height;
-	(x.firstElementChild as HTMLElement).style.height = height;
-	ManageKeyBlocker(x);
-});
 
 function OnMenuExists(elem: HTMLElement) {
+	const height = "308px";
+	elem.style.height = height;
+	(elem.firstElementChild as HTMLElement).style.height = height;
+	InitKeyBlocker(elem);
+}
+
+OnElementExists("body > div.ytp-popup.ytp-contextmenu", OnMenuExists);
+
+
+function OnMenuPanelExists(elem: HTMLElement) {
 	const newParent = elem.nextSibling as HTMLElement;
 	elem.remove();
 
@@ -36,5 +40,5 @@ function OnMenuExists(elem: HTMLElement) {
 
 OnElementExists(
 	"body > div.ytp-popup.ytp-contextmenu > div.ytp-panel > div.ytp-panel-menu > div",
-	OnMenuExists
+	OnMenuPanelExists
 );

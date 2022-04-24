@@ -55,10 +55,50 @@ export default class Repeater {
 	}
 
 	IsInputSelected(): boolean {
-		return this.repeaterBody!.GetInputs().some((x) => x === document.activeElement);
+		return this.repeaterBody!.GetInputs().some(
+			(x) => x === document.activeElement
+		);
+	}
+
+	SetInputToVideoTimes(video: HTMLVideoElement) {
+		if (!this.repeaterBody) return;
+		const fromInput = this.repeaterBody.FromInput;
+		const toInput = this.repeaterBody.ToInput;
+
+		fromInput.value = "";
+		toInput.value = "";
+
+		let actualSecs = video.duration;
+		let actualMins = 0;
+		let actualHours = 0;
+
+		if (actualSecs > 60) {
+			const mins = actualSecs / 60;
+			const roundedMins = Math.floor(mins);
+			actualMins = roundedMins;
+			actualSecs -= roundedMins * 60;
+		}
+
+		if (actualMins > 60) {
+			const hours = actualMins / 60;
+			const roundedHours = Math.floor(hours);
+			actualHours = roundedHours;
+			actualMins -= roundedHours * 60;
+		}
+
+		if (actualHours > 1) {
+			toInput.value = actualHours.toString() + ":";
+			if (actualMins < 10) toInput.value += "0";
+		}
+		toInput.value += actualMins.toString() + ":";
+		if (actualSecs < 10) toInput.value += "0";
+		toInput.value += Math.floor(actualSecs).toString();
+
+		fromInput.value = "0:00";
 	}
 
 	async Init(sibling: HTMLElement, positon: InsertPosition): Promise<void> {
+		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
 		const repeater = (this.repeaterBody = await RepeaterBody.AddBody(
 			sibling,
 			positon
@@ -66,12 +106,11 @@ export default class Repeater {
 		const body = repeater.GetBody();
 		const icon = body.querySelector("div.repeater-icon") as HTMLElement;
 
-		const video = (await TryGetElementByTag("video")) as HTMLVideoElement;
+		this.SetInputToVideoTimes(video);
 
 		const stopCheckLoop = async () => {
 			console.log("Stopping Loop");
-			if (!this.currentLoop)
-				return;
+			if (!this.currentLoop) return;
 			this.currentLoop.Stop();
 			this.currentLoop = undefined;
 		};
@@ -91,6 +130,10 @@ export default class Repeater {
 			console.log(`icon toggle ${state}`);
 			icon.classList.toggle("repeater-icon-glow", state);
 		});
+
+		video.oncanplay = () => {
+			this.SetInputToVideoTimes(video);
+		};
 
 		video.onpause = async () => {
 			console.log("DBG: ONPAUSE");
