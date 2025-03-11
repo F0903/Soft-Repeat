@@ -1,5 +1,7 @@
 # Soft-Repeat
 
+**NOTE: this project is no longer maintained and is not recommended to be used**
+
 ![Logo](media/Soft%20Repeat%20Logo%20V2.png)
 
 An extension that lets you repeat between two custom points in a YouTube video, softly interpolating the volume inbetween.
